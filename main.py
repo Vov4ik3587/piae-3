@@ -70,13 +70,13 @@ iteration = 0
 while True:
     # Выберем точки, не содержащиеся в плане
     x_s = np.array(
-        [elem for elem in spectrum if elem not in cur_plan['x']]
+        [elem for elem in np.random.permutation(spectrum) if elem not in cur_plan['x']]
     )
 
     # Найдем значение дисперсии в точках вне плана
     cur_variance_s = np.array(
         [calculate_variance(x, cur_info_mat)
-         for x in x_s[:10]]
+         for x in x_s]
     )
 
     # Добавим точку с максимальной дисперсией в план и изменим его
@@ -90,32 +90,31 @@ while True:
     cur_plan['p'] = 1 / cur_plan['N'] * np.ones(cur_plan['N'])
     cur_info_mat = calculate_info_mat(cur_plan['x'], cur_plan['p'])
 
-#     # Удалим точку с минимальной дисперсией из текущего плана
-#     x_j = cur_plan['x']
-#
-#     cur_variance_j = np.array(
-#         [calculate_variance(x, cur_info_mat)
-#          for x in x_j]
-#     )
-#
-#     # Нашли точки с минимальной дисперсией
-#     min_variance = np.min(cur_variance_j)
-#     picked_x_j_index = np.where(cur_variance_j == min_variance)
-#
-#     # Перестраиваем план, удаляя точку
-#     cur_plan['x'] = np.delete(cur_plan['x'], picked_x_j_index)
-#     cur_plan['N'] -= 1
-#     cur_plan['p'] = 1 / cur_plan['N'] * np.ones(cur_plan['N'])
-#     cur_info_mat = calculate_info_mat(
-#         cur_plan['x'], cur_plan['p'])
-#
-#     if picked_x_s_index == picked_x_j_index or iteration == 500:
-#         break
-#     iteration += 1
-#
-# # %% Выведем характеристики полученного плана
-# end_plan = cur_plan.copy()
-# draw_plan(end_plan['x'], 'Оптимальный план')
-# print(f'Значение D-функционала начального плана = {D_functional(start_plan)}')
-# print(f'Значение D-функционала конечного плана = {D_functional(end_plan)}')
-# print(f'Количество итераций = {iteration}')
+    # Удалим точку с минимальной дисперсией из текущего плана
+    x_j = cur_plan['x']
+    cur_variance_j = np.array(
+        [calculate_variance(x, cur_info_mat)
+         for x in x_j]
+    )
+
+    # Нашли точки с минимальной дисперсией
+    min_variance = np.min(cur_variance_j)
+    picked_x_j_index = np.where(cur_variance_j == min_variance)[:1]
+
+    # Перестраиваем план, удаляя точку
+    cur_plan['x'] = np.delete(cur_plan['x'], (picked_x_j_index[0]), axis=0)
+    cur_plan['N'] -= 1
+    cur_plan['p'] = 1 / cur_plan['N'] * np.ones(cur_plan['N'])
+    cur_info_mat = calculate_info_mat(
+        cur_plan['x'], cur_plan['p'])
+
+    if picked_x_s_index == picked_x_j_index or iteration == 2000:
+        break
+    iteration += 1
+
+# %% Выведем характеристики полученного плана
+end_plan = cur_plan.copy()
+draw_plan(end_plan['x'].T, 'Оптимальный план')
+print(f'Значение D-функционала начального плана = {D_functional(start_plan)}')
+print(f'Значение D-функционала конечного плана = {D_functional(end_plan)}')
+print(f'Количество итераций = {iteration}')
