@@ -39,8 +39,8 @@ def draw_plan(x, title):
 
 
 # %% Строим сетку по заданным характеристикам
-N = 20  # число наблюдений
-size_web = 30  # размерность сетки
+N = 40  # число наблюдений
+size_web = 40  # размерность сетки
 factors_interval_min, factors_interval_max = -1, 1  # область определения модели
 
 # Дискретное множество Х
@@ -53,7 +53,7 @@ weight = 1 / N * np.ones(N)  # Вектор весов
 
 # Реализуем рандомную выборку точек из множества Х для плана размерности N
 spectrum = np.transpose([np.tile(x1, len(x2)), np.repeat(x2, len(x1))])
-random_indexes = np.random.randint(0, N**2 - 1, N)
+random_indexes = np.random.randint(0, size_web**2 - 1, N)
 
 start_plan = {
     'x': np.array([spectrum[ind] for ind in random_indexes]),
@@ -82,11 +82,11 @@ while True:
 
     # Добавим точку с максимальной дисперсией в план и изменим его
     max_variance = np.max(cur_variance_s)
-    picked_x_s_index = np.where(cur_variance_s == max_variance)[:1][0]
-
+    picked_x_s_index = np.where(cur_variance_s == max_variance)[0]
+    picked_x_s_index = picked_x_s_index[:1][0]
     # Перестраиваем план
-    tmp = x_s[picked_x_s_index[0]].reshape(1,2)
-    cur_plan['x'] = np.append(cur_plan['x'], x_s[picked_x_s_index[0]].reshape(1, 2), axis=0)
+    tmp = x_s[picked_x_s_index].reshape(1,2)
+    cur_plan['x'] = np.append(cur_plan['x'], x_s[picked_x_s_index].reshape(1, 2), axis=0)
     cur_plan['N'] += 1
     cur_plan['p'] = 1 / cur_plan['N'] * np.ones(cur_plan['N'])
     cur_info_mat = calculate_info_mat(cur_plan['x'], cur_plan['p'])
@@ -100,10 +100,10 @@ while True:
 
     # Нашли точки с минимальной дисперсией
     min_variance = np.min(cur_variance_j)
-    picked_x_j_index = np.where(cur_variance_j == min_variance)[:1][0]
-
+    picked_x_j_index = np.where(cur_variance_j == min_variance)[0]
+    picked_x_j_index = picked_x_j_index[:1][0]
     # Перестраиваем план, удаляя точку
-    cur_plan['x'] = np.delete(cur_plan['x'], (picked_x_j_index[0]), axis=0)
+    cur_plan['x'] = np.delete(cur_plan['x'], (picked_x_j_index), axis=0)
     cur_plan['N'] -= 1
     cur_plan['p'] = 1 / cur_plan['N'] * np.ones(cur_plan['N'])
     cur_info_mat = calculate_info_mat(
