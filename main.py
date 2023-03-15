@@ -81,7 +81,7 @@ while True:
 
     # Добавим точку с максимальной дисперсией в план и изменим его
     max_variance = np.max(cur_variance_s)
-    picked_x_s_index = np.where(cur_variance_s == max_variance)[0]
+    picked_x_s_index = np.where(cur_variance_s == max_variance)[:1][0]
 
     # Перестраиваем план
     tmp = x_s[picked_x_s_index[0]].reshape(1,2)
@@ -99,7 +99,7 @@ while True:
 
     # Нашли точки с минимальной дисперсией
     min_variance = np.min(cur_variance_j)
-    picked_x_j_index = np.where(cur_variance_j == min_variance)[:1]
+    picked_x_j_index = np.where(cur_variance_j == min_variance)[:1][0]
 
     # Перестраиваем план, удаляя точку
     cur_plan['x'] = np.delete(cur_plan['x'], (picked_x_j_index[0]), axis=0)
